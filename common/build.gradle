@@ -34,3 +34,4 @@ dependencies {
 //    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
 
 }
+apply from: 'https://raw.githubusercontent.com/xujichang/push_gradle/master/upload.gradle'
