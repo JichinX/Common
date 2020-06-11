@@ -33,11 +33,10 @@ import kotlin.Unit;
  * @author xujichang
  */
 public class RxViews implements LifecycleEventObserver {
+    public static final long DEFAULT_DURATION = 500;
     /**
      * 根据LifecycleOwner 作为标识 存储RxViews
      */
-    private static final ConcurrentMap<LifecycleOwner, RxViews> mViews = Maps.newConcurrentMap();
-
     private CompositeDisposable mDisposables;
 
     private RxViews(LifecycleOwner pOwner) {
@@ -45,17 +44,16 @@ public class RxViews implements LifecycleEventObserver {
     }
 
     public static RxViews getInstance(LifecycleOwner pOwner) {
-        RxViews vRxViews = mViews.get(pOwner);
-        if (null == vRxViews) {
-            vRxViews = new RxViews(pOwner);
-            mViews.put(pOwner, vRxViews);
-        }
-        return vRxViews;
+        return new RxViews(pOwner);
     }
 
     public void click(View view, final View.OnClickListener onClickListener) {
+        click(view, onClickListener, DEFAULT_DURATION);
+    }
+
+    public void click(View view, final View.OnClickListener onClickListener, long ms) {
         addDisposable(RxView.clicks(view)
-                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .throttleFirst(ms, TimeUnit.MILLISECONDS)
                 .subscribe(new ViewClickConsumer(view, onClickListener)));
     }
 
@@ -74,29 +72,13 @@ public class RxViews implements LifecycleEventObserver {
         return mDisposables;
     }
 
-    public static <T> ObservableTransformer<T, T> ioToMainObservableSchedule() {
-        return new ObservableTransformer<T, T>() {
-            @Override
-            public ObservableSource<T> apply(Observable<T> upstream) {
-                return upstream.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
-            }
-        };
-    }
-
     @Override
     public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
         switch (event) {
-            case ON_ANY:
-            case ON_STOP:
-            case ON_PAUSE:
-            case ON_START:
-            case ON_CREATE:
-            case ON_RESUME:
-            default:
-                break;
             case ON_DESTROY:
                 dispose();
+                break;
+            default:
                 break;
         }
     }
