@@ -1,5 +1,7 @@
-apply plugin: 'com.android.library'
-
+plugins {
+    id 'maven-publish'
+    id 'com.android.library'
+}
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -19,33 +21,79 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    ndkVersion '21.3.6528147'
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
 
-    def nav_version = "2.3.0-beta01"
-    // Java language implementation
-    implementation "androidx.navigation:navigation-fragment:$nav_version"
-    implementation "androidx.navigation:navigation-ui:$nav_version"
-    // Dynamic Feature Module Support
-//    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
-    implementation 'com.google.guava:guava:29.0-android'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation(libraries_base)
+    implementation(libraries_navigation)
+    implementation(libraries_guava)
 
-    implementation 'com.jakewharton.rxbinding3:rxbinding:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-core:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-appcompat:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-drawerlayout:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-leanback:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-recyclerview:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-slidingpanelayout:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-swiperefreshlayout:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-viewpager:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-viewpager2:3.1.0'
-    implementation 'com.jakewharton.rxbinding3:rxbinding-material:3.1.0'
-
+    implementation(libraries_rxbinding)
+    implementation(libraries_rxjava)
 }
 //apply from: 'https://raw.githubusercontent.com/xujichang/push_gradle/master/upload.gradle'
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    failOnError = false
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+//artifacts {
+//    archives javadocJar
+//    archives sourcesJar
+//}
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            local(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+                artifact sourcesJar
+                artifact javadocJar
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.github.xujichang'
+                artifactId = rootProject.name
+                version = '1.0.0-beta01'
+            }
+            // Creates a Maven publication called “debug”.
+//            jcenter(MavenPublication) {
+//                // Applies the component for the debug build variant.
+//                from components.release
+//                groupId = 'com.github.xujichang'
+//                artifactId = rootProject.name
+//                version = '1.0'
+//            }
+        }
+//        repositories {
+//            maven {
+//                // change to point to your repo, e.g. http://my.org/repo
+//                url = "$buildDir/repo"
+//            }
+//        }
+    }
+}

@@ -1,4 +1,4 @@
-package me.xujichang.lib.common.util;
+package me.xujichang.lib.common.rx;
 
 import android.view.View;
 
@@ -7,20 +7,13 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.google.common.collect.Maps;
 import com.jakewharton.rxbinding3.view.RxView;
 
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.ObservableTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import kotlin.Unit;
 
 /**

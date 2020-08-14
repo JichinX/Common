@@ -1,4 +1,4 @@
-package me.xujichang.lib.common.base;
+package me.xujichang.lib.common.status;
 
 /**
  * @author xujichang on 2020/5/13.
