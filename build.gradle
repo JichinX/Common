@@ -15,7 +15,7 @@ buildscript {
 
 allprojects {
     repositories {
-        maven { url JCENTER_PROXY }
+//        maven { url JCENTER_PROXY }
         maven { url "https://jitpack.io" }
         google()
         jcenter()
